@@ -22,11 +22,11 @@ Includes MySQL, Redis, Nginx and PHP services using Docker Compose.
 
 ## Installation
 
-1. Clone this repository into your project folder:
+1. Clone this repository into your projects folder:
 
    `git clone git@github.com:Lubje/docker-template-laravel8.git my-new-project`
 
-1. Move in to your new project folder:
+1. Enter your newly created project folder:
 
     `cd my-new-project`
 
@@ -36,7 +36,9 @@ Includes MySQL, Redis, Nginx and PHP services using Docker Compose.
 
 1. Open the .env file and change the values to your liking.
 
-    The PROJECT_NAME will be used to name your Docker services and images.
+    The PROJECT_NAME will be used to name your Docker services, Docker images and the database.
+    
+    For the rest of the examples we will assume the PROJECT_NAME has a value of "my-new-project".
 
 1. Temporarily create the public folder that will be mounted through the volumes in the docker-compose.yml file:
 
@@ -50,21 +52,25 @@ Includes MySQL, Redis, Nginx and PHP services using Docker Compose.
 
     `docker-compose up -d`
 
-1. Enter the bash shell of your PHP container:
+1. Remove the earlier created temporary public folder:
 
-    `docker exec -it {PROJECT-NAME}-php bash`
+    `rm -rf src/public`
+    
+    The public folder will be recreated during the Laravel installation in the next step. 
 
-1. Install Laravel from the bash shell of your PHP container:
+1. Enter the bash shell of your PHP container and install Laravel:
+
+    `docker exec -it my-new-project-php bash`
 
     `composer create-project --prefer-dist laravel/laravel .`
 
-1. Edit the Redis and MySQL variables in your src/.env file to match the following:
+1. Edit the Redis and MySQL variables in the newly created src/.env file to match the following:
 
     ```
     DB_CONNECTION=mysql
     DB_HOST=mysql
     DB_PORT=3306
-    DB_DATABASE={PROJECT_NAME}
+    DB_DATABASE=my-new-project
     DB_USERNAME=user
     DB_PASSWORD=password
     
@@ -78,14 +84,20 @@ Includes MySQL, Redis, Nginx and PHP services using Docker Compose.
     REDIS_PASSWORD=null
     REDIS_PORT=6379
     ```
+   
+   Make sure you set DB_DATABASE to the same value that PROJECT_NAME has in the root .env file.
 
-   Make sure that you replace "{PROJECT_NAME}" with the value that you set earlier in the root .env file.
+1. Exit the bash shell and restart the services:
 
-1. Run the initial migrations from the bash shell of your PHP container:
+    `exit`
 
-    `php artisan migrate`
+    `docker-compose restart`
 
-1. Use the NGINX_PORT you set in the root .env file to access your newly created app, by navigating to `http://localhost:{NGINX_EXTERNAL_PORT}`.
+1. Run the initial migrations:
+
+    `docker exec -it my-new-project-php php artisan migrate`
+
+1. Use the NGINX_EXTERNAL_PORT you set in the root .env file to access your running app, by navigating to `http://localhost:{NGINX_EXTERNAL_PORT}`.
 
 
 ## Install scaffolding through Jetstream (optional)

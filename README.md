@@ -26,15 +26,13 @@ Includes MySQL, Redis, Nginx and PHP services using Docker Compose.
 
    `git clone git@github.com:Lubje/docker-template-laravel8.git my-new-project`
 
-1. Enter your newly created project folder:
+1. Enter your newly created project folder and copy the .env file:
 
     `cd my-new-project`
 
-1. Copy the .env.example file:
-
     `cp .env.example .env`
 
-1. Open the .env file and change the values to your liking.
+    Open the .env file and change the values to your liking.
 
     The PROJECT_NAME will be used to name your Docker services, Docker images and the database.
     
@@ -42,7 +40,7 @@ Includes MySQL, Redis, Nginx and PHP services using Docker Compose.
 
 1. Temporarily create the public folder that will be mounted through the volumes in the docker-compose.yml file:
 
-    `mkdir -p src/public/`
+    `mkdir -p src/public`
 
 1. Create the external network, so we can connect to MySQL, Redis and NGINX using the external ports set in the root .env file:
 
@@ -92,19 +90,32 @@ Includes MySQL, Redis, Nginx and PHP services using Docker Compose.
     `exit`
 
     `docker-compose restart`
+ 
+1.  [ OPTIONAL ] Install scaffolding through Jetstream:
 
-1. Run the initial migrations:
+    `docker exec -it my-new-project-php composer require laravel/jetstream`
+ 
+    1.  Install either the Livewire or the Inertia variant:
+    
+        Livewire + Tailwind CSS:
+    
+        `docker exec -it my-new-project-php php artisan jetstream:install livewire`
+
+        Inertia + Tailwind CSS:
+    
+        `docker exec -it my-new-project-php php artisan jetstream:install inertia`
+        
+        Add the --teams flag at the end of the Livewire or Inertia installation command to enable the teams functionality.
+
+    1. Compile the assets:
+    
+        `docker exec -it my-new-project-php npm install`
+    
+        `docker exec -it my-new-project-php npm run dev`
+
+1. Run the migrations:
 
     `docker exec -it my-new-project-php php artisan migrate`
 
-1. Use the NGINX_EXTERNAL_PORT you set in the root .env file to access your running app, by navigating to `http://localhost:{NGINX_EXTERNAL_PORT}`.
-
-
-## Install scaffolding through Jetstream (optional)
- 
- 
-### Option 1: Livewire + Tailwind CSS
-
-
-### Option 2: Inertia + Tailwind CSS
+1. Visit your running app by navigating to `http://localhost:{NGINX_EXTERNAL_PORT}`.
 

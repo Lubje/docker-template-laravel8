@@ -95,19 +95,21 @@ Includes MySQL, Redis, Nginx and PHP services using Docker Compose.
 
     `docker exec -it my-new-project-php composer require laravel/jetstream`
  
-    1.  Install either the Livewire or the Inertia variant:
+    Install either the Livewire or the Inertia variant (add the --teams flag at the end of the Livewire or Inertia installation command to enable the teams functionality):
     
-        Livewire + Tailwind CSS:
-    
+    1. Livewire + Tailwind CSS:
+
         `docker exec -it my-new-project-php php artisan jetstream:install livewire`
-
-        Inertia + Tailwind CSS:
-    
-        `docker exec -it my-new-project-php php artisan jetstream:install inertia`
         
-        Add the --teams flag at the end of the Livewire or Inertia installation command to enable the teams functionality.
+        Publish the views:
+        
+        `docker exec -it my-new-project-php php artisan vendor:publish --tag=jetstream-views`
 
-    1. Compile the assets:
+    1. Inertia + Tailwind CSS:
+
+        `docker exec -it my-new-project-php php artisan jetstream:install inertia`
+
+    Compile the assets:
     
         `docker exec -it my-new-project-php npm install`
     

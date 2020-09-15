@@ -54,6 +54,7 @@ services:
       - redis
     environment:
       PHP_EXTENSION_BCMATH: 1
+      PHP_EXTENSION_PCOV: 1
     image: ${PROJECT_NAME}-php
     networks:
       - internal

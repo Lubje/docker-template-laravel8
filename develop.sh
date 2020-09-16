@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Usage:
+# 1. Make this file executable (only needed once): 'chmod +x develop.sh'
+# 2. List the available commands: './develop.sh'
+
 # Get environment variables from root .env file
 if [ -f .env ]; then
   export $(echo $(cat .env | sed 's/#.*//g'| xargs) | envsubst)
@@ -195,7 +199,7 @@ case "$1" in
     exitIfComposerPackageIsNotInstalled barryvdh/laravel-ide-helper
     addCommandForTarget container "php artisan clear-compiled"
     addCommandForTarget container "php artisan ide-helper:generate --helpers"
-    addCommandForTarget container "php artisan ide-helper:models --nowrite"
+    addCommandForTarget container "php artisan ide-helper:models --write"
     addCommandForTarget container "php artisan ide-helper:meta" ;;
 
   # Routes

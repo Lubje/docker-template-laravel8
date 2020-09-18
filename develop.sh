@@ -4,10 +4,14 @@
 # 1. Make this file executable (only needed once): 'chmod +x develop.sh'
 # 2. List the available commands: './develop.sh'
 
-# Get environment variables from root .env file
-if [ -f .env ]; then
-  export $(echo $(cat .env | sed 's/#.*//g'| xargs) | envsubst)
+# Make sure the .env file is present
+if  [ ! -f .env ]; then
+  echo "No .env file found."
+  exit 1;
 fi
+
+# Export environment variables from the root .env file to get access to the PROJECT NAME value
+export $(echo $(cat .env | sed 's/#.*//g'| xargs) | envsubst)
 
 # Set output colors and spacing
 DEFAULT="\033[0m"
@@ -28,6 +32,8 @@ if [ -z "$1" ] || [ "$1" == "help" ] || [ "$1" == "commands" ]; then
   printf "${COMMAND}   update-dry     ${SPACING}${DEFAULT}Fake update composer dependencies\n"
 
   printf "${CATEGORY} Database\n"
+  printf "${COMMAND}   db             ${SPACING}${DEFAULT}Open the database\n"
+  printf "${COMMAND}   dbtest         ${SPACING}${DEFAULT}Open the test database\n"
   printf "${COMMAND}   fresh|refresh  ${SPACING}${DEFAULT}Drop all tables and run all migrations\n"
   printf "${COMMAND}   fresh-seed     ${SPACING}${DEFAULT}Drop all tables and run all migrations and seeders\n"
   printf "${COMMAND}   migrate        ${SPACING}${DEFAULT}Run the database migrations\n"
@@ -130,6 +136,26 @@ case "$1" in
     addCommandForTarget container "composer update --dry-run" ;;
 
   # Database
+  db)
+    if  [ ! -f src/.env ]; then
+      echo "No src/.env file found."
+      exit 1;
+    fi
+    DB_CONNECTION=$(grep DB_CONNECTION src/.env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+    DB_USERNAME=$(grep DB_USERNAME src/.env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+    DB_PASSWORD=$(grep DB_PASSWORD src/.env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+    DB_DATABASE=$(grep DB_DATABASE src/.env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+    addCommandForTarget host "open ${DB_CONNECTION}://${DB_USERNAME}:${DB_PASSWORD}@127.0.0.1:${MYSQL_EXTERNAL_PORT}/${DB_DATABASE}" ;;
+  dbtest)
+    if  [ ! -f src/.env.testing ]; then
+      echo "No src/.env.testing file found."
+      exit 1;
+    fi
+    DB_CONNECTION=$(grep DB_CONNECTION src/.env.testing | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+    DB_USERNAME=$(grep DB_USERNAME src/.env.testing | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+    DB_PASSWORD=$(grep DB_PASSWORD src/.env.testing | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+    DB_DATABASE=$(grep DB_DATABASE src/.env.testing | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+    addCommandForTarget host "open ${DB_CONNECTION}://${DB_USERNAME}:${DB_PASSWORD}@127.0.0.1:${MYSQL_EXTERNAL_PORT}/${DB_DATABASE}" ;;
   fresh|refresh)
     addCommandForTarget container "php artisan migrate:fresh" ;;
   fresh-seed)

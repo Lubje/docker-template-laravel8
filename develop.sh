@@ -68,10 +68,7 @@ if [ -z "$1" ] || [ "$1" == "help" ] || [ "$1" == "commands" ]; then
   printf "${COMMAND}   ide-helper     ${SPACING}${DEFAULT}Create IDE autocompletion files\n"
 
   printf "${CATEGORY} Routes\n"
-  printf "${COMMAND}   routes         ${SPACING}${DEFAULT}List all routes\n"
-  printf "${COMMAND}   routes-method  ${SPACING}${DEFAULT}List routes filtered by method use 1st argument as filter-value\n"
-  printf "${COMMAND}   routes-name    ${SPACING}${DEFAULT}List routes filtered by name, use 1st argument as filter-value\n"
-  printf "${COMMAND}   routes-path    ${SPACING}${DEFAULT}List routes filtered by path, use 1st argument as filter-value\n"
+  printf "${COMMAND}   routes         ${SPACING}${DEFAULT}List routes, with optional filter string\n"
 
   printf "${CATEGORY} Testing\n"
   printf "${COMMAND}   pest|test|tests${SPACING}${DEFAULT}Run all tests\n"
@@ -222,13 +219,7 @@ case "$1" in
 
   # Routes
   routes)
-    addCommandForTarget container "php artisan route:list" ;;
-  routes-method)
-    addCommandForTarget container "php artisan route:list --method=$2" ;;
-  routes-name)
-    addCommandForTarget container "php artisan route:list --name=$2" ;;
-  routes-path|routes-uri)
-    addCommandForTarget container "php artisan route:list --path=$2" ;;
+    addCommandForTarget container "php artisan route:list --columns=method,action,uri,name $([[ $# -gt 1 ]] && echo "| grep --color -F $2")" ;;
 
   # Testing
   pest|test|tests)
@@ -253,7 +244,7 @@ do
     # Display actual command
     printf "${CATEGORY}Executing: ${DEFAULT}docker exec -it ${PROJECT_NAME}-php %s\n" "${commands[$i]}"
     # Execute command
-    docker exec -it "${PROJECT_NAME}"-php ${commands[$i]}
+    docker exec -it "${PROJECT_NAME}"-php bash -c "${commands[$i]}"
   else
     # Display actual command
     printf "${CATEGORY}Executing: ${DEFAULT}%s\n" "${commands[$i]}"

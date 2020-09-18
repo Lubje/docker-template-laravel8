@@ -135,25 +135,27 @@ case "$1" in
   # Database
   db)
     environmentSuffix=""
-    if [[ $# -gt 1 ]]; then
-      [ ! -f src/.env."$2" ] && { echo "No src/.env.$2 file found."; exit 1; }
-      environmentSuffix=".$2"
-    fi
+    [[ $# -gt 1 ]] && [ ! -f src/.env."$2" ] && { echo "No src/.env.$2 file found."; exit 1; }
+    [[ $# -gt 1 ]] && environmentSuffix=".$2";
     DB_CONNECTION=$(grep DB_CONNECTION src/.env"$environmentSuffix" | grep -v -e '^\s*#' | cut -d '=' -f 2-)
     DB_USERNAME=$(grep DB_USERNAME src/.env"$environmentSuffix" | grep -v -e '^\s*#' | cut -d '=' -f 2-)
     DB_PASSWORD=$(grep DB_PASSWORD src/.env"$environmentSuffix" | grep -v -e '^\s*#' | cut -d '=' -f 2-)
     DB_DATABASE=$(grep DB_DATABASE src/.env"$environmentSuffix" | grep -v -e '^\s*#' | cut -d '=' -f 2-)
     addCommandForTarget host "open ${DB_CONNECTION}://${DB_USERNAME}:${DB_PASSWORD}@127.0.0.1:${MYSQL_EXTERNAL_PORT}/${DB_DATABASE}" ;;
   fresh|refresh)
+    [[ $# -gt 1 ]] && [ ! -f src/.env."$2" ] && { echo "No src/.env.$2 file found."; exit 1; }
     addCommandForTarget container "php artisan migrate:fresh $([[ $# -gt 1 ]] && echo "--env=$2")" ;;
   fresh-seed)
+    [[ $# -gt 1 ]] && [ ! -f src/.env."$2" ] && { echo "No src/.env.$2 file found."; exit 1; }
     addCommandForTarget container "php artisan migrate:fresh $([[ $# -gt 1 ]] && echo "--env=$2")"
     addCommandForTarget container "php artisan db:seed $([[ $# -gt 1 ]] && echo "--env=$2")" ;;
   migrate)
+    [[ $# -gt 1 ]] && [ ! -f src/.env."$2" ] && { echo "No src/.env.$2 file found."; exit 1; }
     addCommandForTarget container "php artisan migrate $([[ $# -gt 1 ]] && echo "--env=$2")" ;;
   redis)
     addCommandForTarget host "open redis://127.0.0.1:${REDIS_EXTERNAL_PORT}" ;;
   seed)
+    [[ $# -gt 1 ]] && [ ! -f src/.env."$2" ] && { echo "No src/.env.$2 file found."; exit 1; }
     addCommandForTarget container "php artisan db:seed $([[ $# -gt 1 ]] && echo "--env=$2")" ;;
 
   # Docker

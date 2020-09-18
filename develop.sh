@@ -5,10 +5,7 @@
 # 2. List the available commands: './develop.sh'
 
 # Make sure the .env file is present
-if  [ ! -f .env ]; then
-  echo "No .env file found."
-  exit 1;
-fi
+[ ! -f .env ] && { echo "No .env file found."; exit 1; }
 
 # Export environment variables from the root .env file to get access to the PROJECT NAME value
 export $(echo $(cat .env | sed 's/#.*//g'| xargs) | envsubst)
@@ -137,20 +134,14 @@ case "$1" in
 
   # Database
   db)
-    if  [ ! -f src/.env ]; then
-      echo "No src/.env file found."
-      exit 1;
-    fi
+    [ ! -f src/.env ] && { echo "No src/.env file found."; exit 1; }
     DB_CONNECTION=$(grep DB_CONNECTION src/.env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
     DB_USERNAME=$(grep DB_USERNAME src/.env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
     DB_PASSWORD=$(grep DB_PASSWORD src/.env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
     DB_DATABASE=$(grep DB_DATABASE src/.env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
     addCommandForTarget host "open ${DB_CONNECTION}://${DB_USERNAME}:${DB_PASSWORD}@127.0.0.1:${MYSQL_EXTERNAL_PORT}/${DB_DATABASE}" ;;
   dbtest)
-    if  [ ! -f src/.env.testing ]; then
-      echo "No src/.env.testing file found."
-      exit 1;
-    fi
+    [ ! -f src/.env.testing ] && { echo "No src/.env.testing file found."; exit 1; }
     DB_CONNECTION=$(grep DB_CONNECTION src/.env.testing | grep -v -e '^\s*#' | cut -d '=' -f 2-)
     DB_USERNAME=$(grep DB_USERNAME src/.env.testing | grep -v -e '^\s*#' | cut -d '=' -f 2-)
     DB_PASSWORD=$(grep DB_PASSWORD src/.env.testing | grep -v -e '^\s*#' | cut -d '=' -f 2-)

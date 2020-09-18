@@ -28,13 +28,13 @@ if [ -z "$1" ] || [ "$1" == "help" ] || [ "$1" == "commands" ]; then
   printf "${COMMAND}   update         ${SPACING}${DEFAULT}Update composer dependencies\n"
   printf "${COMMAND}   update-dry     ${SPACING}${DEFAULT}Fake update composer dependencies\n"
 
-  printf "${CATEGORY} Database\n"
-  printf "${COMMAND}   db             ${SPACING}${DEFAULT}Open the database\n"
-  printf "${COMMAND}   dbtest         ${SPACING}${DEFAULT}Open the test database\n"
-  printf "${COMMAND}   fresh|refresh  ${SPACING}${DEFAULT}Drop all tables and run all migrations\n"
-  printf "${COMMAND}   fresh-seed     ${SPACING}${DEFAULT}Drop all tables and run all migrations and seeders\n"
-  printf "${COMMAND}   migrate        ${SPACING}${DEFAULT}Run the database migrations\n"
-  printf "${COMMAND}   seed           ${SPACING}${DEFAULT}Seed the database with records\n"
+  printf "${CATEGORY} Database \n"
+  printf "${COMMAND}   db             ${SPACING}${DEFAULT}Open the database (optional 1st argument is environment)\n"
+  printf "${COMMAND}   fresh|refresh  ${SPACING}${DEFAULT}Drop all tables and run all migrations (optional 1st argument is environment)\n"
+  printf "${COMMAND}   fresh-seed     ${SPACING}${DEFAULT}Drop all tables and run all migrations and seeders (optional 1st argument is environment)\n"
+  printf "${COMMAND}   migrate        ${SPACING}${DEFAULT}Run the database migrations (optional 1st argument is environment)\n"
+  printf "${COMMAND}   redis          ${SPACING}${DEFAULT}Open the Redis database\n"
+  printf "${COMMAND}   seed           ${SPACING}${DEFAULT}Seed the database with records (optional 1st argument is environment)\n"
 
   printf "${CATEGORY} Docker\n"
   printf "${COMMAND}   build|rebuild  ${SPACING}${DEFAULT}Build the images without cache\n"
@@ -134,28 +134,27 @@ case "$1" in
 
   # Database
   db)
-    [ ! -f src/.env ] && { echo "No src/.env file found."; exit 1; }
-    DB_CONNECTION=$(grep DB_CONNECTION src/.env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
-    DB_USERNAME=$(grep DB_USERNAME src/.env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
-    DB_PASSWORD=$(grep DB_PASSWORD src/.env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
-    DB_DATABASE=$(grep DB_DATABASE src/.env | grep -v -e '^\s*#' | cut -d '=' -f 2-)
-    addCommandForTarget host "open ${DB_CONNECTION}://${DB_USERNAME}:${DB_PASSWORD}@127.0.0.1:${MYSQL_EXTERNAL_PORT}/${DB_DATABASE}" ;;
-  dbtest)
-    [ ! -f src/.env.testing ] && { echo "No src/.env.testing file found."; exit 1; }
-    DB_CONNECTION=$(grep DB_CONNECTION src/.env.testing | grep -v -e '^\s*#' | cut -d '=' -f 2-)
-    DB_USERNAME=$(grep DB_USERNAME src/.env.testing | grep -v -e '^\s*#' | cut -d '=' -f 2-)
-    DB_PASSWORD=$(grep DB_PASSWORD src/.env.testing | grep -v -e '^\s*#' | cut -d '=' -f 2-)
-    DB_DATABASE=$(grep DB_DATABASE src/.env.testing | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+    environmentSuffix=""
+    if [[ $# -gt 1 ]]; then
+      [ ! -f src/.env."$2" ] && { echo "No src/.env.$2 file found."; exit 1; }
+      environmentSuffix=".$2"
+    fi
+    DB_CONNECTION=$(grep DB_CONNECTION src/.env"$environmentSuffix" | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+    DB_USERNAME=$(grep DB_USERNAME src/.env"$environmentSuffix" | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+    DB_PASSWORD=$(grep DB_PASSWORD src/.env"$environmentSuffix" | grep -v -e '^\s*#' | cut -d '=' -f 2-)
+    DB_DATABASE=$(grep DB_DATABASE src/.env"$environmentSuffix" | grep -v -e '^\s*#' | cut -d '=' -f 2-)
     addCommandForTarget host "open ${DB_CONNECTION}://${DB_USERNAME}:${DB_PASSWORD}@127.0.0.1:${MYSQL_EXTERNAL_PORT}/${DB_DATABASE}" ;;
   fresh|refresh)
-    addCommandForTarget container "php artisan migrate:fresh" ;;
+    addCommandForTarget container "php artisan migrate:fresh $([[ $# -gt 1 ]] && echo "--env=$2")" ;;
   fresh-seed)
-    addCommandForTarget container "php artisan migrate:fresh"
-    addCommandForTarget container "php artisan db:seed" ;;
+    addCommandForTarget container "php artisan migrate:fresh $([[ $# -gt 1 ]] && echo "--env=$2")"
+    addCommandForTarget container "php artisan db:seed $([[ $# -gt 1 ]] && echo "--env=$2")" ;;
   migrate)
-    addCommandForTarget container "php artisan migrate" ;;
+    addCommandForTarget container "php artisan migrate $([[ $# -gt 1 ]] && echo "--env=$2")" ;;
+  redis)
+    addCommandForTarget host "open redis://127.0.0.1:${REDIS_EXTERNAL_PORT}" ;;
   seed)
-    addCommandForTarget container "php artisan db:seed" ;;
+    addCommandForTarget container "php artisan db:seed $([[ $# -gt 1 ]] && echo "--env=$2")" ;;
 
   # Docker
   build|rebuild)

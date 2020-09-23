@@ -214,7 +214,7 @@ case "$1" in
     exitIfComposerPackageIsNotInstalled barryvdh/laravel-ide-helper
     addCommandForTarget container "php artisan clear-compiled"
     addCommandForTarget container "php artisan ide-helper:generate --helpers"
-    addCommandForTarget container "php artisan ide-helper:models --reset"
+    addCommandForTarget container "php artisan ide-helper:models --write --reset"
     addCommandForTarget container "php artisan ide-helper:meta" ;;
 
   # Routes

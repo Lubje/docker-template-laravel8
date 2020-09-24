@@ -45,7 +45,7 @@ services:
   php:
     build:
       args:
-        PHP_VERSION: ${PHP_VERSION}
+        PHP_IMAGE: ${PHP_IMAGE}
       context: .
       dockerfile: docker/php/Dockerfile
     container_name: ${PROJECT_NAME}-php

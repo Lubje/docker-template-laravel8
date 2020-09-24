@@ -55,6 +55,9 @@ services:
     environment:
       PHP_EXTENSION_BCMATH: 1
       PHP_EXTENSION_PCOV: 1
+      PHP_EXTENSION_XDEBUG: 1
+      PHP_INI_XDEBUG__REMOTE_HOST: ${XDEBUG_REMOTE_HOST}
+      PHP_INI_XDEBUG__REMOTE_PORT: ${XDEBUG_REMOTE_PORT}
     image: ${PROJECT_NAME}-php
     networks:
       - internal

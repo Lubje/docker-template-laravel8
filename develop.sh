@@ -65,7 +65,7 @@ if [ -z "$1" ] || [ "$1" == "help" ] || [ "$1" == "commands" ]; then
 
   printf "${CATEGORY} Optimization\n"
   printf "${COMMAND}   cache|clear    ${SPACING}${DEFAULT}Clear all the cache\n"
-  printf "${COMMAND}   ide-helper     ${SPACING}${DEFAULT}Create IDE autocompletion files\n"
+  printf "${COMMAND}   ide|ide-helper ${SPACING}${DEFAULT}Create IDE autocompletion files\n"
 
   printf "${CATEGORY} Routes\n"
   printf "${COMMAND}   routes         ${SPACING}${DEFAULT}List routes, with optional filter string\n"
@@ -210,7 +210,7 @@ case "$1" in
   cache|clear)
     addCommandForTarget container "php artisan event:clear"
     addCommandForTarget container "php artisan optimize:clear" ;;
-  ide-helper)
+  ide|ide-helper)
     exitIfComposerPackageIsNotInstalled barryvdh/laravel-ide-helper
     addCommandForTarget container "php artisan clear-compiled"
     addCommandForTarget container "php artisan ide-helper:generate --helpers"
